@@ -767,4 +767,43 @@ spec:
     delayAfterAdd: 10s
     delayAfterDelete: 10s
     delayAfterFailure: 10s
+`).setIn([referenceForModel(k8sModels.VirtualMachineModel), 'default'], `
+apiVersion: ${k8sModels.VirtualMachineModel.apiGroup}/${k8sModels.VirtualMachineModel.apiVersion}
+kind: VirtualMachine
+metadata:
+  name: example
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/size: small
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: registrydisk
+              volumeName: registryvolume
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              volumeName: cloudinitvolume
+              disk:
+                bus: virtio
+          interfaces:
+          - name: default
+            bridge: {}
+        resources:
+          requests:
+            memory: 64M
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+        - name: registryvolume
+          registryDisk:
+            image: kubevirt/cirros-registry-disk-demo
+        - name: cloudinitvolume
+          cloudInitNoCloud:
+            userDataBase64: SGkuXG4=
 `);
