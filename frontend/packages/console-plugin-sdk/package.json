@@ -1,0 +1,7 @@
+{
+  "name": "@console/plugin-sdk",
+  "version": "0.0.0-fixed",
+  "description": "Static plugin SDK for OpenShift Web Console",
+  "private": true,
+  "main": "src/index.ts"
+}

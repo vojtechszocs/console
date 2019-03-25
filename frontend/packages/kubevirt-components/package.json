@@ -1,0 +1,17 @@
+{
+  "name": "@console/kubevirt-components",
+  "version": "0.0.1",
+  "description": "KubeVirt React components",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "cosmos": "echo 'Run Cosmos playground for testing React components'"
+  },
+  "dependencies": {
+    "@console/shared": "0.0.0-fixed",
+    "@patternfly/react-console": "1.9.1"
+  },
+  "devDependencies": {
+    "react-cosmos": "4.7.x"
+  }
+}

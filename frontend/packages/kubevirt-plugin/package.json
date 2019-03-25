@@ -1,0 +1,11 @@
+{
+  "name": "@console/kubevirt-plugin",
+  "version": "0.0.1-alpha1",
+  "description": "KubeVirt plugin for OpenShift Web Console",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "@console/plugin-sdk": "0.0.0-fixed",
+    "@console/kubevirt-components": "0.0.1"
+  }
+}

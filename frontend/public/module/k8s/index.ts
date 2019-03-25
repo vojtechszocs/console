@@ -13,6 +13,9 @@ export * from './label-selector';
 export * from './cluster-operator';
 export * from './cluster-settings';
 
+import { Selector } from '@console/shared';
+export { MatchExpression, Selector, K8sKind } from '@console/shared';
+
 export type OwnerReference = {
   name: string;
   kind: string;
@@ -52,13 +55,6 @@ export type K8sResourceCondition<T> = {
   lastTransitionTime: string;
   reason: string;
   message: string;
-};
-
-export type MatchExpression = {key: string, operator: 'Exists' | 'DoesNotExist'} | {key: string, operator: 'In' | 'NotIn' | 'Equals' | 'NotEquals', values: string[]};
-
-export type Selector = {
-  matchLabels?: {[key: string]: string};
-  matchExpressions?: MatchExpression[];
 };
 
 export type K8sResourceKind = {
@@ -276,26 +272,6 @@ export type ClusterOperator = {
     relatedObjects?: ClusterOperatorObjectReference[];
   };
 } & K8sResourceKind;
-
-export type K8sKind = {
-  abbr: string;
-  kind: string;
-  label: string;
-  labelPlural: string;
-  path: string;
-  plural: string;
-  propagationPolicy?: 'Foreground' | 'Background';
-
-  id?: string;
-  crd?: boolean;
-  apiVersion: string;
-  apiGroup?: string;
-  namespaced?: boolean;
-  selector?: Selector;
-  labels?: {[key: string]: string};
-  annotations?: {[key: string]: string};
-  verbs?: string[];
-};
 
 export type ContainerPort = {
   containerPort: number,

@@ -1,0 +1,7 @@
+{
+  "name": "@console/shared",
+  "version": "0.0.0-fixed",
+  "description": "Common code shared between all packages",
+  "private": true,
+  "main": "src/index.ts"
+}
