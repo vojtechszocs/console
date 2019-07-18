@@ -82,8 +82,11 @@ export const featureReducer = (state: FeatureState, action: FeatureAction): Feat
   }
 };
 
-export const stateToProps = (desiredFlags: string[], state) => {
-  const flags = desiredFlags.reduce((allFlags, f) => ({...allFlags, [f]: state[featureReducerName].get(f)}), {});
+export const stateToProps = (desiredFlags: string[] = [], state) => {
+  const featureState = state[featureReducerName] as FeatureState;
+  // If desiredFlags is empty, use all the available feature flags
+  const flagNames = _.isEmpty(desiredFlags) ? featureState.keySeq().toArray() : desiredFlags;
+  const flags = flagNames.reduce((allFlags, f) => ({...allFlags, [f]: featureState.get(f)}), {});
   return {flags};
 };
 
@@ -93,6 +96,7 @@ type WithFlagsProps = {
 
 export type ConnectToFlags = <P extends WithFlagsProps>(...flags: (FLAGS | string)[]) => (C: React.ComponentType<P>) =>
   React.ComponentType<Omit<P, keyof WithFlagsProps>> & {WrappedComponent: React.ComponentType<P>};
+
 export const connectToFlags: ConnectToFlags = (...flags) => connect(state => stateToProps(flags, state), null, null, {areStatePropsEqual: _.isEqual});
 
 // Flag detection is not complete if the flag's value is `undefined`.

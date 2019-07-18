@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import {
   Extension,
-  ActivePlugin,
   isModelDefinition,
   isFeatureFlag,
   isNavItem,
@@ -25,13 +24,11 @@ import {
 
 /**
  * Registry used to query for Console extensions.
+ *
+ * TODO(vojtech): legacy, remove
  */
 export class ExtensionRegistry {
-  private readonly extensions: Extension[];
-
-  public constructor(plugins: ActivePlugin[]) {
-    this.extensions = _.flatMap(plugins.map((p) => p.extensions));
-  }
+  public constructor(private readonly extensions: Extension[]) {}
 
   public getModelDefinitions() {
     return this.extensions.filter(isModelDefinition);

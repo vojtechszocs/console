@@ -6,8 +6,7 @@ import { StatusGroupMapper } from '@console/internal/components/dashboard/invent
 import { OverviewQuery } from '@console/internal/components/dashboards-page/overview-dashboard/queries';
 import { ConsumerMutator } from '@console/internal/components/dashboards-page/overview-dashboard/top-consumers-card';
 import { MetricType } from '@console/internal/components/dashboard/top-consumers-card/metric-type';
-import { Extension } from './extension';
-import { LazyLoader } from './types';
+import { Extension, LazyLoader } from './common';
 
 namespace ExtensionProperties {
   interface DashboardsOverviewHealthSubsystem<R> {

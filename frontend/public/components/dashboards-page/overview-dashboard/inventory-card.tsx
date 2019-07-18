@@ -1,7 +1,12 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 
-import * as plugins from '../../../plugins';
+import {
+  Extension,
+  connectToExtensions,
+  DashboardsOverviewInventoryItem,
+  isDashboardsOverviewInventoryItem,
+} from '@console/plugin-sdk';
 import {
   DashboardCard,
   DashboardCardBody,
@@ -38,9 +43,8 @@ const uniqueResource = (resource: FirehoseResource, index: number): FirehoseReso
   prop: `${index}-${resource.prop}`,
 });
 
-const getResourcesToWatch = (): FirehoseResource[] => {
+const getResourcesToWatch = (pluginItems: DashboardsOverviewInventoryItem[]): FirehoseResource[] => {
   const allResources = [...k8sResources];
-  const pluginItems = plugins.registry.getDashboardsOverviewInventoryItems();
   pluginItems.forEach((item, index) => {
     allResources.push(uniqueResource(item.properties.resource, index));
     if (item.properties.additionalResources) {
@@ -50,9 +54,18 @@ const getResourcesToWatch = (): FirehoseResource[] => {
   return allResources;
 };
 
-const InventoryCard_: React.FC<DashboardItemProps> = ({ watchK8sResource, stopWatchK8sResource, resources }) => {
+const mapExtensionsToProps = (extensions: Extension[]) => ({
+  pluginItems: extensions.filter(isDashboardsOverviewInventoryItem),
+});
+
+const InventoryCard_: React.FC<DashboardItemProps & InventoryCardExtensionProps> = ({
+  watchK8sResource,
+  stopWatchK8sResource,
+  resources,
+  pluginItems,
+}) => {
   React.useEffect(() => {
-    const resourcesToWatch = getResourcesToWatch();
+    const resourcesToWatch = getResourcesToWatch(pluginItems);
     resourcesToWatch.forEach(r => watchK8sResource(r));
     return () => {
       resourcesToWatch.forEach(r => stopWatchK8sResource(r));
@@ -71,7 +84,6 @@ const InventoryCard_: React.FC<DashboardItemProps> = ({ watchK8sResource, stopWa
   const pvcsLoadError = _.get(resources.pvcs, 'loadError');
   const pvcsData = _.get(resources.pvcs, 'data', []) as K8sResourceKind[];
 
-  const pluginItems = plugins.registry.getDashboardsOverviewInventoryItems();
   return (
     <DashboardCard>
       <DashboardCardHeader>
@@ -81,6 +93,7 @@ const InventoryCard_: React.FC<DashboardItemProps> = ({ watchK8sResource, stopWa
         <ResourceInventoryItem isLoading={!nodesLoaded} error={!!nodesLoadError} kind={NodeModel} resources={nodesData} mapper={getNodeStatusGroups} />
         <ResourceInventoryItem isLoading={!podsLoaded} error={!!podsLoadError} kind={PodModel} resources={podsData} mapper={getPodStatusGroups} />
         <ResourceInventoryItem isLoading={!pvcsLoaded} error={!!pvcsLoadError} kind={PersistentVolumeClaimModel} useAbbr resources={pvcsData} mapper={getPVCStatusGroups} />
+
         {pluginItems.map((item, index) => {
           const resource = _.get(resources, uniqueResource(item.properties.resource, index).prop);
           const resourceLoaded = _.get(resource, 'loaded');
@@ -118,4 +131,10 @@ const InventoryCard_: React.FC<DashboardItemProps> = ({ watchK8sResource, stopWa
   );
 };
 
-export const InventoryCard = withDashboardResources(InventoryCard_);
+export const InventoryCard = withDashboardResources(
+  connectToExtensions<InventoryCardExtensionProps>(mapExtensionsToProps)(InventoryCard_)
+);
+
+type InventoryCardExtensionProps = {
+  pluginItems: DashboardsOverviewInventoryItem[];
+};
