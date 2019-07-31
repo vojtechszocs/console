@@ -1,6 +1,9 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import * as _ from 'lodash';
 
-import { connectToFlags } from '@console/internal/reducers/features';
+import { RootState } from '@console/internal/redux';
+import { featureReducerName } from '@console/internal/reducers/features';
 import { pluginStore } from '@console/internal/plugins';
 import { Extension } from '.';
 
@@ -19,20 +22,26 @@ import { Extension } from '.';
  *   - all disallowed feature flags are resolved to `false`
  */
 export const connectToExtensions: ConnectToExtensions = (mapExtensionsToProps) => (Component) => {
-  const Inner = connectToFlags()((props) => {
-    const extensions = pluginStore.getExtensionsInUse(props.flags);
-    const extensionProps = mapExtensionsToProps(extensions);
-    return <Component {...props} {...extensionProps} />;
+  const mapStateToProps = (state: RootState) => ({
+    allFlags_: state[featureReducerName],
   });
 
-  const HOC = (props) => <Inner {...props} />;
+  const ComponentWrapper = connect(mapStateToProps)(
+    (props) => {
+      const extensions = pluginStore.getExtensionsInUse(props.allFlags_);
+      const extensionProps = mapExtensionsToProps(extensions);
+      return <Component {..._.omit(props, 'allFlags_')} {...extensionProps} />;
+    }
+  );
+
+  const HOC = (props) => <ComponentWrapper {...props} />;
   HOC.displayName = `connectToExtensions(${Component.displayName || Component.name})`;
   HOC.WrappedComponent = Component;
   return HOC;
 };
 
 type ConnectToExtensions = <ExtensionProps = any, OwnProps = any>(
-  mapExtensionsToProps: MapExtensionsToProps<ExtensionProps>
+  mapExtensionsToProps: MapExtensionsToProps<ExtensionProps>,
 ) => (Component: React.ComponentType<ExtensionProps>)
   => React.ComponentType<OwnProps> & {WrappedComponent: React.ComponentType<ExtensionProps>};
 

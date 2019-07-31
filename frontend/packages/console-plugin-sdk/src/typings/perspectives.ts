@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { FlagsObject } from '@console/internal/reducers/features';
 import { Extension } from './common';
 
 namespace ExtensionProperties {
@@ -29,4 +30,4 @@ export const isPerspective = (e: Extension): e is Perspective => {
   return e.type === 'Perspective';
 };
 
-export type GetLandingPage = (flags: { [key: string]: boolean }) => string;
+export type GetLandingPage = (flags: FlagsObject) => string;

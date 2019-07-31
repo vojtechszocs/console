@@ -54,11 +54,7 @@ const getResourcesToWatch = (pluginItems: DashboardsOverviewInventoryItem[]): Fi
   return allResources;
 };
 
-const mapExtensionsToProps = (extensions: Extension[]) => ({
-  pluginItems: extensions.filter(isDashboardsOverviewInventoryItem),
-});
-
-const InventoryCard_: React.FC<DashboardItemProps & InventoryCardExtensionProps> = ({
+const InventoryCard_: React.FC<InventoryCardProps> = ({
   watchK8sResource,
   stopWatchK8sResource,
   resources,
@@ -131,10 +127,12 @@ const InventoryCard_: React.FC<DashboardItemProps & InventoryCardExtensionProps>
   );
 };
 
-export const InventoryCard = withDashboardResources(
-  connectToExtensions<InventoryCardExtensionProps>(mapExtensionsToProps)(InventoryCard_)
-);
+const mapExtensionsToProps = (extensions: Extension[]) => ({
+  pluginItems: extensions.filter(isDashboardsOverviewInventoryItem),
+});
 
-type InventoryCardExtensionProps = {
+export const InventoryCard = withDashboardResources(connectToExtensions(mapExtensionsToProps)(InventoryCard_));
+
+type InventoryCardProps = DashboardItemProps & {
   pluginItems: DashboardsOverviewInventoryItem[];
 };

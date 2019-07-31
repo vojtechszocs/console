@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { flagPending } from '@console/internal/reducers/features';
+import { flagPending, FeatureState } from '@console/internal/reducers/features';
 import { Extension, ActivePlugin, isFeatureFlag, isModelDefinition } from './typings';
 import { ExtensionRegistry } from './registry';
 
@@ -47,19 +47,29 @@ export class PluginStore {
         });
       });
 
-      // freeze
-      p.extensions = p.extensions.map((e) => {
-        return _.assignWith(e, (value) => _.isObject(value) ? Object.freeze(value) : value);
-      });
+      // TODO(vojtech): freeze?
     });
 
     this.extensions = _.flatMap(plugins.map((p) => p.extensions));
     this.registry = new ExtensionRegistry(this.extensions);
   }
 
-  public getExtensionsInUse(flags: {[key: string]: boolean}) {
-    return this.extensions
-      .filter((e) => e.flags.required.every((f) => !flagPending(flags[f]) && flags[f]))
-      .filter((e) => e.flags.disallowed.every((f) => !flagPending(flags[f]) && !flags[f]));
+  public getExtensionsInUse(flags: FeatureState) {
+    const isPending = (f: string) => flagPending(flags.get(f));
+    const isEnabled = (f: string) => flags.get(f) === true;
+
+    return this.extensions.filter((e) => {
+      if (!e.flags) {
+        // always-on extension
+        return true;
+      }
+
+      return e.flags.required.every((f) => !isPending(f) && isEnabled(f))
+        && e.flags.disallowed.every((f) => !isPending(f) && !isEnabled(f));
+    });
+  }
+
+  public getAlwaysOnExtensions() {
+    return this.extensions.filter((e) => !e.flags);
   }
 }

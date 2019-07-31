@@ -1,30 +1,42 @@
 import * as React from 'react';
-import * as plugins from '@console/internal/plugins';
+import { connect } from 'react-redux';
 import { Formik } from 'formik';
+
+import {
+  Extension,
+  connectToExtensions,
+  Perspective,
+  isPerspective,
+} from '@console/plugin-sdk';
+
 import { history, AsyncComponent } from '@console/internal/components/utils';
 import { getActivePerspective } from '@console/internal/reducers/ui';
 import { RootState } from '@console/internal/redux';
-import { connect } from 'react-redux';
 import { NormalizedBuilderImages, normalizeBuilderImages } from '../../utils/imagestream-utils';
 import { GitImportFormData, FirehoseList, ImportData } from './import-types';
 import { createResources } from './import-submit-utils';
 import { validationSchema } from './import-validation-utils';
 
-export interface ImportFormProps {
+interface ImportFormProps {
   namespace: string;
   importData: ImportData;
   imageStreams?: FirehoseList;
 }
 
-export interface StateProps {
+interface StateProps {
   perspective: string;
 }
 
-const ImportForm: React.FC<ImportFormProps & StateProps> = ({
+interface ExtensionProps {
+  pluginPerspectives: Perspective[];
+}
+
+const ImportForm: React.FC<ImportFormProps & StateProps & ExtensionProps> = ({
   namespace,
   imageStreams,
   importData,
   perspective,
+  pluginPerspectives,
 }) => {
   const initialValues: GitImportFormData = {
     name: '',
@@ -118,9 +130,7 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
     imageStreams && imageStreams.loaded && normalizeBuilderImages(imageStreams.data);
 
   const handleRedirect = (project: string) => {
-    const perspectiveData = plugins.registry
-      .getPerspectives()
-      .find((item) => item.properties.id === perspective);
+    const perspectiveData = pluginPerspectives.find((item) => item.properties.id === perspective);
     const redirectURL = perspectiveData.properties.getImportRedirectURL(project);
     history.push(redirectURL);
   };
@@ -159,10 +169,14 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
   );
 };
 
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    perspective: getActivePerspective(state),
-  };
-};
+const mapStateToProps = (state: RootState): StateProps => ({
+  perspective: getActivePerspective(state),
+});
 
-export default connect(mapStateToProps)(ImportForm);
+const mapExtensionsToProps = (extensions: Extension[]) => ({
+  pluginPerspectives: extensions.filter(isPerspective),
+});
+
+export default connect(mapStateToProps)(
+  connectToExtensions<ExtensionProps, ImportFormProps>(mapExtensionsToProps)(ImportForm)
+);

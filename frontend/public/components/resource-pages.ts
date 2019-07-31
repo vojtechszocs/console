@@ -1,5 +1,7 @@
 import { Map as ImmutableMap } from 'immutable';
 
+import { ResourceListPage, ResourceDetailsPage } from '@console/plugin-sdk';
+
 import { ReportReference, ReportGenerationQueryReference } from './chargeback';
 import { referenceForModel, GroupVersionKind } from '../module/k8s';
 import {
@@ -131,10 +133,10 @@ export const baseDetailsPages = ImmutableMap<ResourceMapKey, ResourceMapValue>()
   .set(referenceForModel(ClusterVersionModel), () => import('./cluster-settings/cluster-version' /* webpackChunkName: "cluster-version" */).then(m => m.ClusterVersionDetailsPage))
   .set(referenceForModel(OAuthModel), () => import('./cluster-settings/oauth' /* webpackChunkName: "oauth" */).then(m => m.OAuthDetailsPage));
 
-export const resourceDetailsPages = ImmutableMap<ResourceMapKey, ResourceMapValue>()
-  .merge(baseDetailsPages)
-  .withMutations(map => {
-    plugins.registry.getResourceDetailsPages().forEach(page => {
+// TODO(vojtech) _.memoize with resolver _.isEqual
+export const getResourceDetailsPages = (pluginDetailsPages: ResourceDetailsPage[]) =>
+  baseDetailsPages.withMutations(map => {
+    pluginDetailsPages.forEach(page => {
       addResourcePage(map, page);
     });
   });
@@ -194,10 +196,10 @@ export const baseListPages = ImmutableMap<ResourceMapKey, ResourceMapValue>()
   .set(referenceForModel(InstallPlanModel), () => import('./operator-lifecycle-manager/install-plan' /* webpackChunkName: "install-plan" */).then(m => m.InstallPlansPage))
   .set(referenceForModel(ClusterOperatorModel), () => import('./cluster-settings/cluster-operator' /* webpackChunkName: "cluster-operator" */).then(m => m.ClusterOperatorPage));
 
-export const resourceListPages = ImmutableMap<ResourceMapKey, ResourceMapValue>()
-  .merge(baseListPages)
-  .withMutations(map => {
-    plugins.registry.getResourceListPages().forEach(page => {
+// TODO(vojtech) _.memoize with resolver _.isEqual
+export const getResourceListPages = (pluginListPages: ResourceListPage[]) =>
+  baseListPages.withMutations(map => {
+    pluginListPages.forEach(page => {
       addResourcePage(map, page);
     });
   });
