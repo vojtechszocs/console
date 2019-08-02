@@ -2,12 +2,12 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, DropdownItem, DropdownToggle, Title } from '@patternfly/react-core';
 import { CaretDownIcon } from '@patternfly/react-icons';
-import { Extension } from '@console/plugin-sdk/src/typings';
-import * as plugins from '../../plugins';
+import { Extension, isPerspective, Perspective } from '@console/plugin-sdk/src/typings';
 import { RootState } from '../../redux';
 import { getActivePerspective } from '../../reducers/ui';
 import * as UIActions from '../../actions/ui';
 import { history } from '../utils';
+import { connectToExtensions } from '@console/plugin-sdk';
 
 type StateProps = {
   activePerspective: string;
@@ -16,12 +16,14 @@ type StateProps = {
 
 export type NavHeaderProps = {
   onPerspectiveSelected: () => void;
+  pluginPerspectives: Perspective[];
 };
 
 const NavHeader_: React.FC<NavHeaderProps & StateProps> = ({
   setActivePerspective,
   onPerspectiveSelected,
   activePerspective,
+  pluginPerspectives,
 }) => {
   const [isPerspectiveDropdownOpen, setPerspectiveDropdownOpen] = React.useState(false);
 
@@ -74,8 +76,7 @@ const NavHeader_: React.FC<NavHeaderProps & StateProps> = ({
     ));
   };
 
-  const perspectives: Extension[] = plugins.registry.getPerspectives();
-  const { icon, name } = perspectives.find((p) => p.properties.id === activePerspective).properties;
+  const { icon, name } = pluginPerspectives.find((p) => p.properties.id === activePerspective).properties;
 
   return (
     <div className="oc-nav-header">
@@ -83,7 +84,7 @@ const NavHeader_: React.FC<NavHeaderProps & StateProps> = ({
         isOpen={isPerspectiveDropdownOpen}
         toggle={renderToggle(icon, name)}
         autoFocus={false}
-        dropdownItems={getPerspectiveItems(perspectives)}
+        dropdownItems={getPerspectiveItems(pluginPerspectives)}
         data-test-id="perspective-switcher-menu"
       />
     </div>
@@ -96,9 +97,13 @@ const mapStateToProps = (state: RootState): StateProps => {
   };
 };
 
+const mapExtensionsToProps = (extensions: Extension[]) => ({
+  pluginPerspectives: extensions.filter(isPerspective),
+});
+
 export default connect<StateProps, {}, NavHeaderProps>(
   mapStateToProps,
   { setActivePerspective: UIActions.setActivePerspective }
 )(
-  NavHeader_
+  connectToExtensions(mapExtensionsToProps)(NavHeader_)
 );
