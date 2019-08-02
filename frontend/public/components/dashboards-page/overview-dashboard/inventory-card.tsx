@@ -19,6 +19,7 @@ import { PodModel, NodeModel, PersistentVolumeClaimModel } from '../../../models
 import { K8sResourceKind, PodKind } from '../../../module/k8s';
 import { getPodStatusGroups, getNodeStatusGroups, getPVCStatusGroups } from '../../dashboard/inventory-card/utils';
 import { FirehoseResource } from '../../utils';
+import { useEffectDeepCompare } from '../../utils/use-effect-deep-compare';
 
 const k8sResources: FirehoseResource[] = [
   {
@@ -60,13 +61,13 @@ const InventoryCard_: React.FC<InventoryCardProps> = ({
   resources,
   pluginItems,
 }) => {
-  React.useEffect(() => {
+  useEffectDeepCompare(() => {
     const resourcesToWatch = getResourcesToWatch(pluginItems);
     resourcesToWatch.forEach(r => watchK8sResource(r));
     return () => {
       resourcesToWatch.forEach(r => stopWatchK8sResource(r));
     };
-  }, [watchK8sResource, stopWatchK8sResource]);
+  }, [watchK8sResource, stopWatchK8sResource], [pluginItems]);
 
   const nodesLoaded = _.get(resources.nodes, 'loaded');
   const nodesLoadError = _.get(resources.nodes, 'loadError');
