@@ -91,6 +91,8 @@ const MonitoringNavSection = connect(monitoringNavSectionStateToProps)(Monitorin
 const AdminNav = () => (
   <>
     <NavSection title="Home">
+      <HrefLink href="/remote-module-demo-1" name="Demo 1 (function)" />
+      <HrefLink href="/remote-module-demo-2" name="Demo 2 (component)" />
       <HrefLink
         href="/dashboards"
         activePath="/dashboards/"
