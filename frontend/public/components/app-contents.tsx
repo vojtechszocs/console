@@ -21,8 +21,6 @@ import { RootState } from '../redux';
 //PF4 Imports
 import { PageSection, PageSectionVariants } from '@patternfly/react-core';
 
-import { RemoteDemo1, RemoteDemo2 } from '../dynamic-plugins/remote-demo';
-
 const RedirectComponent = (props) => {
   const to = `/k8s${props.location.pathname}`;
   return <Redirect to={to} />;
@@ -114,9 +112,6 @@ const AppContents_: React.FC<AppContentsProps> = ({ activePerspective, flags }) 
       <div id="content-scrollable">
         <Switch>
           {getPluginPageRoutes(activePerspective, flags)}
-
-          <Route path="/remote-module-demo-1" exact component={RemoteDemo1} />
-          <Route path="/remote-module-demo-2" exact component={RemoteDemo2} />
 
           <Route path={['/all-namespaces', '/ns/:ns']} component={RedirectComponent} />
           <LazyRoute
