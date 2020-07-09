@@ -20,7 +20,10 @@ import { RootState } from '../redux';
 import { ActionType as K8sActionType } from '../actions/k8s';
 import { FeatureAction, ActionType } from '../actions/features';
 import { FLAGS } from '@console/shared/src/constants';
-import { subscribeToExtensions, extensionDiffListener } from '@console/plugin-sdk';
+import {
+  subscribeToExtensions,
+  extensionDiffListener,
+} from '@console/plugin-sdk/src/subscribeToExtensions';
 import * as plugins from '../plugins';
 import {
   ModelFeatureFlag as DynamicModelFeatureFlag,
@@ -62,6 +65,8 @@ plugins.registry
 
 subscribeToExtensions<DynamicModelFeatureFlag>(
   extensionDiffListener((added, removed) => {
+    debugger; // TODO TEST
+
     const getModelRef = (e: DynamicModelFeatureFlag) => {
       const model = e.properties.model;
       return referenceForGroupVersionKind(model.group)(model.version)(model.kind);

@@ -2,7 +2,10 @@ import { Dispatch } from 'react-redux';
 import * as _ from 'lodash-es';
 import { ActionType as Action, action } from 'typesafe-actions';
 import { FLAGS } from '@console/shared/src/constants/common';
-import { subscribeToExtensions, extensionDiffListener } from '@console/plugin-sdk';
+import {
+  subscribeToExtensions,
+  extensionDiffListener,
+} from '@console/plugin-sdk/src/subscribeToExtensions';
 import store from '../redux';
 import { GroupModel, SelfSubjectAccessReviewModel, UserModel } from '../models';
 import { k8sBasePath, ClusterVersionKind, k8sCreate } from '../module/k8s';
@@ -283,6 +286,8 @@ const processedExtensions: DynamicFeatureFlag[] = [];
 
 subscribeToExtensions<DynamicFeatureFlag>(
   extensionDiffListener((added) => {
+    debugger; // TODO TEST
+
     added.forEach((e) => {
       if (!processedExtensions.includes(e)) {
         processedExtensions.push(e);
