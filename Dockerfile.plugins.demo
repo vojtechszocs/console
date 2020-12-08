@@ -1,0 +1,41 @@
+# Used for testing OpenShift Console dynamic plugin capabilities.
+#
+# See frontend/dynamic-demo-plugin/README.md for details.
+
+ARG build_path=/go/src/github.com/openshift/console
+ARG install_path=/opt/console-demo-plugin
+
+# build the plugin
+FROM quay.io/coreos/tectonic-console-builder:v21 AS build
+ARG build_path
+RUN mkdir -p ${build_path}
+ADD . ${build_path}
+
+WORKDIR ${build_path}/frontend
+RUN yarn install
+
+WORKDIR ${build_path}/frontend/dynamic-demo-plugin
+RUN yarn install && \
+    yarn build
+
+# prepare the image
+# TODO: is there some OpenShift/Node.js application image we could use, besides the builder one?
+FROM quay.io/coreos/tectonic-console-builder:v21
+ARG build_path
+ARG install_path
+
+COPY --from=build ${build_path}/frontend/dynamic-demo-plugin/dist ${install_path}/dist
+COPY --from=build ${build_path}/frontend/dynamic-demo-plugin/node_modules ${install_path}/node_modules
+COPY --from=build ${build_path}/frontend/dynamic-demo-plugin/package.json ${install_path}/package.json
+
+LABEL io.k8s.display-name="OpenShift Console Demo Plugin" \
+      io.k8s.description="Sample OpenShift Console plugin used for testing purposes." \
+      io.openshift.tags="openshift" \
+      maintainer="Samuel Padgett <spadgett@redhat.com>"
+
+# run the server hosting plugin's assets
+USER 1001
+WORKDIR ${install_path}
+
+# TODO: configure k8s manifest to inject SSL cert and key files (service serving certificate)
+CMD ["yarn", "http-server", "--ssl", "--cert", "/var/serving-cert/tls.crt", "--key", "/var/serving-cert/tls.key"]
