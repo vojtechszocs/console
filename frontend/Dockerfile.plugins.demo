@@ -1,0 +1,25 @@
+# Used for testing OpenShift Console dynamic plugin capabilities.
+#
+# This image builds `dynamic-demo-plugin` and serves its assets via HTTP server.
+
+FROM quay.io/coreos/tectonic-console-builder:v21 AS build
+
+RUN mkdir -p /go/src/github.com/openshift/console/frontend/
+ADD . /go/src/github.com/openshift/console/frontend/
+
+WORKDIR /go/src/github.com/openshift/console/frontend/
+RUN yarn install
+
+WORKDIR /go/src/github.com/openshift/console/frontend/dynamic-demo-plugin/
+RUN yarn install && \
+    yarn build
+
+LABEL io.k8s.display-name="OpenShift Console Dynamic Demo Plugin" \
+      io.k8s.description="Sample OpenShift Console dynamic plugin used for testing purposes." \
+      io.openshift.tags="openshift" \
+      maintainer="Samuel Padgett <spadgett@redhat.com>"
+
+# doesn't require a root user
+USER 1001
+
+CMD [ "yarn", "http-server" ]
