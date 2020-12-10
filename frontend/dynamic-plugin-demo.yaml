@@ -59,3 +59,15 @@ spec:
     app: dynamic-plugin-demo
   type: ClusterIP
   sessionAffinity: None
+---
+apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: dynamic-plugin-demo
+spec:
+  displayName: 'Dynamic Plugin Demo'
+  service:
+    name: dynamic-plugin-demo
+    namespace: dynamic-plugin-demo
+    port: 9001
+    basePath: ''
