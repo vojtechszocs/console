@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dynamic-plugin-demo
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dynamic-plugin-demo
+  namespace: dynamic-plugin-demo
+  labels:
+    app: dynamic-plugin-demo
+    app.kubernetes.io/component: dynamic-plugin-demo
+    app.kubernetes.io/instance: dynamic-plugin-demo
+    app.kubernetes.io/part-of: dynamic-plugin-demo
+    app.openshift.io/runtime-namespace: dynamic-plugin-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynamic-plugin-demo
+  template:
+    metadata:
+      labels:
+        app: dynamic-plugin-demo
+    spec:
+      containers:
+        - name: dynamic-plugin-demo
+          image: docker.io/jhadvig/console-plugin:latest
+          ports:
+            - containerPort: 9001
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dynamic-plugin-demo
+  namespace: dynamic-plugin-demo
+  labels:
+    app: dynamic-plugin-demo
+    app.kubernetes.io/component: dynamic-plugin-demo
+    app.kubernetes.io/instance: dynamic-plugin-demo
+    app.kubernetes.io/part-of: dynamic-plugin-demo
+spec:
+  ports:
+    - name: 9001-tcp
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
+  selector:
+    app: dynamic-plugin-demo
+  type: ClusterIP
+  sessionAffinity: None
