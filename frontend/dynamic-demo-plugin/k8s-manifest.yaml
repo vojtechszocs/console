@@ -31,6 +31,21 @@ spec:
             - containerPort: 9001
               protocol: TCP
           imagePullPolicy: Always
+          command:
+            - 'yarn'
+            - 'http-server'
+            - '--ssl'
+            - '--cert=/var/serving-cert/tls.crt'
+            - '--key=/var/serving-cert/tls.key'
+          volumeMounts:
+            - name: console-serving-cert
+              readOnly: true
+              mountPath: /var/serving-cert
+      volumes:
+        - name: console-serving-cert
+          secret:
+            secretName: console-serving-cert
+            defaultMode: 420
       restartPolicy: Always
       dnsPolicy: ClusterFirst
   strategy:
@@ -42,6 +57,8 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: console-serving-cert
   name: console-demo-plugin
   namespace: console-demo-plugin
   labels:
