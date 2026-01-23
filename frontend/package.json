@@ -140,6 +140,7 @@
     ]
   },
   "dependencies": {
+    "@openshift/dynamic-plugin-sdk": "^6.0.0",
     "@patternfly-5/patternfly": "npm:@patternfly/patternfly@5.4.2",
     "@patternfly/patternfly": "^6.2.3",
     "@patternfly/quickstarts": "^6.4.0",
@@ -158,7 +159,6 @@
     "@patternfly/react-topology": "^6.2.0",
     "@patternfly/react-user-feedback": "^6.1.0",
     "@patternfly/react-virtualized-extension": "^6.0.0",
-    "@openshift/dynamic-plugin-sdk": "^6.0.0",
     "@rjsf/core": "^4.2.3",
     "@xterm/addon-fit": "0.10.0",
     "@xterm/xterm": "^5.5.0",

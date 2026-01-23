@@ -8,11 +8,14 @@ import { resolvePluginPackages } from '@console/plugin-sdk/src/codegen/plugin-re
 const testedPlugins = loadLocalPluginsForTestPurposes(resolvePluginPackages());
 const testedPluginStore = new PluginStore();
 
-testedPlugins.forEach((plugin) => {
-  testedPluginStore.loadPlugin(plugin);
-});
+const testedPluginsLoaded = Promise.all(
+  testedPlugins.map((plugin) => testedPluginStore.loadPlugin(plugin)),
+);
 
-export const testedExtensions = ImmutableList<Extension>(testedPluginStore.getExtensions());
+export const getTestedExtensions = async () => {
+  await testedPluginsLoaded;
+  return ImmutableList<Extension>(testedPluginStore.getExtensions());
+}
 
 export const getDuplicates = (values: string[]) => {
   return _.transform(

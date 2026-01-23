@@ -23,26 +23,31 @@ export type {
  * The value of the `$codeRef` property should be formatted as `moduleName.exportName`
  * (referring to a named export) or `moduleName` (referring to the `default` export).
  */
+// TODO: remove and use base plugin SDK types instead
 export type EncodedCodeRef = { $codeRef: string };
 
 /**
  * Code reference, represented by a function that returns a promise for the object `T`.
  */
+// TODO: remove and use base plugin SDK types instead
 export type CodeRef<T = unknown> = SDKCodeRef<T>;
 
 /**
  * Extract type `T` from `CodeRef<T>`.
  */
+// TODO: remove and use base plugin SDK types instead
 export type ExtractCodeRefType<R> = R extends CodeRef<infer T> ? T : never;
 
 /**
  * Infer the properties of extension `E`.
  */
+// TODO: remove and use base plugin SDK types instead
 export type ExtensionProperties<E> = E extends Extension<string, infer P> ? P : never;
 
 /**
  * Update existing properties of extension `E` with ones declared in object `U`.
  */
+// TODO: remove and use base plugin SDK types instead
 export type UpdateExtensionProperties<
   E extends Extension,
   U extends {},
@@ -59,6 +64,7 @@ export type UpdateExtensionProperties<
  *
  * This also coerces `E` type to `LoadedExtension` interface for runtime consumption.
  */
+// TODO: remove and use base plugin SDK types instead
 export type ResolvedExtension<
   E extends Extension,
   P extends AnyObject = ExtensionProperties<E>

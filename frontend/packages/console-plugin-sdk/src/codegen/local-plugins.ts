@@ -172,6 +172,9 @@ export const getDynamicExtensions = (
   return trimStartMultiLine(source);
 };
 
+/**
+ * Get Console local plugins virtual module data and diagnostics.
+ */
 export const getLocalPluginsModuleData = (
   pluginPackages: PluginPackage[],
 ): LocalPluginsModuleData => {

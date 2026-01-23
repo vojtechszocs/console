@@ -8,18 +8,20 @@ const getEnabledDynamicPluginNames = () => {
   if (disabledPlugins === '') {
     return [];
   }
+
   if (!disabledPlugins) {
     return allPluginNames;
   }
 
   const disabledPluginNames = compact(disabledPlugins.split(','));
+
   return uniq(allPluginNames).filter((pluginName) => !disabledPluginNames.includes(pluginName));
 };
 
 /**
- * List of dynamic plugin names from server flags and URL params to be loaded
- * by PluginStore.
+ * List of dynamic plugin names from server flags and URL params to be loaded by Console.
  *
- * This also determines the order in which extensions are returned via useExtensions.
+ * Note: this also determines the order of extensions returned from Console plugin SDK hooks
+ * like `useExtensions` and `useResolvedExtensions`.
  */
 export const dynamicPluginNames = getEnabledDynamicPluginNames();

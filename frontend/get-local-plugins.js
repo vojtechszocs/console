@@ -1,12 +1,14 @@
-/* eslint-disable tsdoc/syntax */ // This file is written in JavaScript, so we use JSDoc here. TSDoc rules don't apply
+// This file is written in JavaScript, so we use JSDoc here. TSDoc rules don't apply.
+/* eslint-disable tsdoc/syntax */
+
 // @ts-check
+
 const { getLocalPluginsModuleData } = require('@console/plugin-sdk/src/codegen/local-plugins');
 
 /**
  * Get the current Console local plugins virtual module information.
  *
- * This module is executed by webpack `val-loader` which uses the resulting `code` as actual module source.
- *
+ * This module is used by webpack `val-loader` which uses the resulting `code` as actual module source.
  *
  * @param {object} options
  * @param {import('@console/plugin-sdk/src/codegen/plugin-resolver').PluginPackage[]} options.pluginPackages

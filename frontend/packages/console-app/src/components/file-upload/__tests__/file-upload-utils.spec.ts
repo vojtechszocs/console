@@ -22,7 +22,7 @@ describe('file-upload-utils', () => {
         handler: handler2,
       },
       type: 'console.file-upload',
-      uid: '@console/dev-console[47]',
+      uid: '@console/dev-console[48]',
     },
   ];
 

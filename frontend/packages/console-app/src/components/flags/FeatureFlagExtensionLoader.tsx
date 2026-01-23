@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useCallback, useRef, useEffect, useLayoutEffect } from 'react';
-import { difference } from 'lodash';
 import {
   isFeatureFlagHookProvider,
   FeatureFlagHookProvider,
@@ -8,21 +7,18 @@ import {
   ModelFeatureFlag,
   FeatureFlag,
   isFeatureFlag,
-  useResolvedExtensions,
   SetFeatureFlag,
 } from '@console/dynamic-plugin-sdk';
-import type {
-  Extension,
-  ExtensionTypeGuard,
-  ResolvedExtension,
-} from '@console/dynamic-plugin-sdk/src/types';
+import type { ResolvedExtension } from '@console/dynamic-plugin-sdk/src/types';
+import { useCompareExtensions } from '@console/plugin-sdk/src/utils/useCompareExtensions';
 import { setFlag, updateModelFlags } from '@console/internal/actions/flags';
 import { useConsoleDispatch } from '@console/shared/src/hooks/useConsoleDispatch';
 import { useConsoleSelector } from '@console/shared/src/hooks/useConsoleSelector';
+import { useResolvedExtensions } from '@console/dynamic-plugin-sdk';
 import { FeatureFlagExtensionHookResolver } from './FeatureFlagExtensionHookResolver';
 
 /**
- * React hook that returns a stable SetFeatureFlag callback.
+ * React hook that returns a stable {@link SetFeatureFlag} callback.
  */
 const useFeatureFlagController = () => {
   const dispatch = useConsoleDispatch();
@@ -35,9 +31,6 @@ const useFeatureFlagController = () => {
   // This avoids "Cannot update a component while rendering" errors with react-redux 8.x
   // because handlers are called during render (they use hooks) but dispatches happen after.
   useLayoutEffect(() => {
-    if (pendingUpdatesRef.current.size === 0) {
-      return;
-    }
     pendingUpdatesRef.current.forEach((enabled, flag) => {
       if (flags.get(flag) !== enabled) {
         dispatch(setFlag(flag, enabled));
@@ -50,28 +43,6 @@ const useFeatureFlagController = () => {
     // Queue the update to be processed after render
     pendingUpdatesRef.current.set(flag, enabled);
   }, []);
-};
-
-/**
- * React hook that invokes a callback whenever the set of extensions
- * matching the given type guard changes.
- */
-const useResolvedExtensionsDiff = <E extends Extension>(
-  typeGuard: ExtensionTypeGuard<E>,
-  onChange: (added: ResolvedExtension<E>[], removed: ResolvedExtension<E>[]) => void,
-) => {
-  const [extensions] = useResolvedExtensions<E>(typeGuard);
-  const prevExtensionsRef = useRef<ResolvedExtension<E>[]>([]);
-
-  useEffect(() => {
-    const added = difference(extensions, prevExtensionsRef.current);
-    const removed = difference(prevExtensionsRef.current, extensions);
-
-    if (added.length > 0 || removed.length > 0) {
-      onChange(added, removed);
-      prevExtensionsRef.current = extensions;
-    }
-  }, [extensions, onChange]);
 };
 
 /**
@@ -93,7 +64,9 @@ const useFeatureFlagExtensions = (featureFlagController: SetFeatureFlag) => {
     [featureFlagController],
   );
 
-  useResolvedExtensionsDiff<FeatureFlag>(isFeatureFlag, handleChange);
+  const [resolvedExtensions] = useResolvedExtensions(isFeatureFlag);
+
+  useCompareExtensions(resolvedExtensions, handleChange);
 };
 
 /**
@@ -122,7 +95,9 @@ const useModelFeatureFlagExtensions = () => {
     [dispatch],
   );
 
-  useResolvedExtensionsDiff<ModelFeatureFlag>(isModelFeatureFlag, handleChange);
+  const [resolvedExtensions] = useResolvedExtensions(isModelFeatureFlag);
+
+  useCompareExtensions(resolvedExtensions, handleChange);
 };
 
 /**

@@ -15,11 +15,11 @@ export const ConsolePluginManifestPage: FC<PageComponentProps> = ({ obj }) => {
   const pluginName = useMemo(() => obj?.metadata?.name, [obj?.metadata?.name]);
 
   const pluginManifest = useMemo(
-    () => pluginInfoEntries.find((entry) => entry.manifest.name === pluginName),
+    () => pluginInfoEntries.find((entry) => entry.manifest.name === pluginName)?.manifest,
     [pluginInfoEntries, pluginName],
-  )?.manifest;
+  );
 
-  const manifestJson = useMemo(() => {
+  const manifestJSON = useMemo(() => {
     return pluginManifest ? JSON.stringify(pluginManifest, null, 2) : '';
   }, [pluginManifest]);
 
@@ -27,7 +27,7 @@ export const ConsolePluginManifestPage: FC<PageComponentProps> = ({ obj }) => {
     <PaneBody fullHeight>
       {pluginManifest ? (
         <BasicCodeEditor
-          code={manifestJson}
+          code={manifestJSON}
           isFullHeight
           isLanguageLabelVisible
           language={Language.json}

@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom-v5-compat';
 import { useAccessReview, WatchK8sResource } from '@console/dynamic-plugin-sdk';
-import type { ConsolePluginManifest } from '@console/dynamic-plugin-sdk/src/build-types';
+import type { ConsoleSupportedCustomProperties } from '@console/dynamic-plugin-sdk/src/build-types';
 import {
   getGroupVersionKindForModel,
   getReferenceForModel,
@@ -305,8 +305,8 @@ const DevPluginsPage: React.FCC<ConsoleOperatorConfigPageProps> = (props) => {
         .map((plugin) => ({
           name: plugin.manifest.name,
           version: plugin.manifest.version,
-          description: (plugin.manifest as ConsolePluginManifest)?.customProperties?.console
-            ?.description,
+          description: (plugin.manifest.customProperties
+            ?.console as ConsoleSupportedCustomProperties)?.description,
           enabled: plugin.enabled,
           status: plugin.status,
           hasCSPViolations: cspViolations[plugin.manifest.name] ?? false,
@@ -335,23 +335,27 @@ const PluginsPage: FC<ConsoleOperatorConfigPageProps> = (props) => {
     return consolePlugins.map((plugin) => {
       const pluginName = plugin?.metadata?.name;
       const enabled = enabledPlugins.includes(pluginName);
+
       const loadedPluginInfo = pluginInfo
         .filter((p) => p.status === 'loaded')
         .find((i) => i.manifest.name === pluginName);
+
       const notLoadedPluginInfo = pluginInfo
         .filter((p) => p.status !== 'loaded')
         .find((i) => i.manifest.name === pluginName);
+
       if (loadedPluginInfo) {
         return {
           name: plugin?.metadata?.name,
           version: loadedPluginInfo?.manifest.version,
-          description: (loadedPluginInfo?.manifest as ConsolePluginManifest)?.customProperties
-            ?.console?.description,
+          description: (loadedPluginInfo?.manifest.customProperties
+            ?.console as ConsoleSupportedCustomProperties)?.description,
           enabled,
           status: loadedPluginInfo?.status,
           hasCSPViolations: cspViolations[loadedPluginInfo?.manifest.name] ?? false,
         };
       }
+
       return {
         name: plugin?.metadata?.name,
         enabled,
